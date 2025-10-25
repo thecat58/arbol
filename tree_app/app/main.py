@@ -8,8 +8,9 @@ import uvicorn
 import os
 import json
 from datetime import datetime
-from .tree_parser import parse_flujo, Node
+from app.tree_parser import parse_flujo, Node
 import sqlite3
+from pathlib import Path
 
 DB_PATH = os.path.join(os.path.dirname(__file__), '..', 'data.db')
 
@@ -106,6 +107,9 @@ def init_db():
 
 @app.get("/tree")
 def get_tree():
+    global ROOT
+    if ROOT is None:
+        load_tree()
     if ROOT is None:
         raise HTTPException(status_code=500, detail="Tree not loaded")
     return JSONResponse(content=ROOT.to_dict())
@@ -129,6 +133,9 @@ class Question(BaseModel):
 
 @app.get("/questions/{phase}")
 async def get_questions(phase: int):
+    global ROOT
+    if ROOT is None:
+        load_tree()
     if ROOT is None:
         raise HTTPException(status_code=500, detail="Tree not loaded")
     
@@ -139,12 +146,10 @@ async def get_questions(phase: int):
         options = []
         for child in q.children:
             if child.node_type == "option":
-                # If option has recommendation-type children, prefer their descriptive text for UI
                 display_text = child.text
                 if getattr(child, 'children', None):
                     recs = [c.text for c in child.children if getattr(c, 'node_type', '') == 'recommendation']
                     if recs:
-                        # join multiple descriptive parts if present
                         display_text = ' / '.join(recs)
                 option_data = {"id": child.id, "text": display_text, "label": child.text}
                 if child.metadata:
@@ -420,11 +425,15 @@ async def save_session(session: ProjectSession):
 
 @app.get("/phases")
 def get_phases():
+    global ROOT
+    if ROOT is None:
+        load_tree()
     if ROOT is None:
         raise HTTPException(status_code=500, detail="Tree not loaded")
     phases = []
     for node in ROOT.children:
-        if node.text.startswith("FASE"):
+        # buscar nodos de tipo 'phase'
+        if getattr(node, 'node_type', '') == 'phase' or node.id.startswith('phase'):
             phases.append({"id": node.id, "text": node.text})
     return phases
 
@@ -432,6 +441,38 @@ def get_phases():
 def index():
     static_index = os.path.join(os.path.dirname(__file__), 'static', 'index.html')
     return FileResponse(static_index, media_type='text/html')
+
+@app.get("/api/questions")
+def api_questions():
+    global ROOT
+    if ROOT is None:
+        load_tree()
+    if ROOT is None:
+        raise HTTPException(status_code=500, detail="Tree not loaded")
+
+    # mapeo coloquial para opciones específicas
+    colloquial_map = {
+        "B2C": "Consumidores — gente/usuarios finales",
+        "B2B": "Empresas — clientes/organizaciones",
+        "Interna": "Uso interno — solo para tu equipo/empresa"
+    }
+
+    out = []
+    for phase in ROOT.children:
+        node = phase.to_dict()
+        # recorrer preguntas y opciones y aplicar texto coloquial si corresponde
+        for child in node.get("children", []):
+            if child.get("type") == "question":
+                for opt in child.get("children", []):
+                    if opt.get("type") == "option":
+                        txt = opt.get("text", "")
+                        if txt in colloquial_map:
+                            # reemplaza el texto mostrado por una versión más coloquial
+                            opt["text"] = colloquial_map[txt]
+                            # opcional: dejar el valor original en otra clave
+                            opt["original_text"] = txt
+        out.append(node)
+    return out
 
 if __name__ == '__main__':
     uvicorn.run('app.main:app', host='127.0.0.1', port=8000, reload=True)

@@ -244,3 +244,296 @@ function exportJSON(recommendations) {
     element.click();
     document.body.removeChild(element);
 }
+
+// Script ligero para obtener preguntas y controlar la navegación del cuestionario
+(async function () {
+  async function fetchQuestions() {
+    const res = await fetch('/api/questions');
+    if (!res.ok) throw new Error('No se pudo cargar /api/questions');
+    return res.json();
+  }
+
+  function flattenQuestions(phases) {
+    const list = [];
+    for (const phase of phases) {
+      const phaseTitle = phase.text || '';
+      const children = phase.children || [];
+      for (const ch of children) {
+        if (ch.type === 'question') {
+          const options = (ch.children || []).filter(c => c.type === 'option').map(o => ({
+            id: o.id,
+            text: o.text,
+            label: o.original_text || o.text || o.id
+          }));
+          list.push({
+            id: ch.id,
+            text: ch.text,
+            phase: ch.phase ?? null,
+            phaseTitle,
+            options
+          });
+        }
+      }
+    }
+    return list;
+  }
+
+  function createUI() {
+    document.body.innerHTML = '';
+    const root = document.createElement('div');
+    root.id = 'qa-app';
+    root.className = 'qa-root';
+
+    const header = document.createElement('header');
+    header.className = 'qa-header';
+    header.innerHTML = '<h1>Asistente — Cuestionario</h1><p>Responde para obtener recomendaciones claras y prácticas.</p>';
+    root.appendChild(header);
+
+    const timeline = document.createElement('div');
+    timeline.id = 'timeline';
+    timeline.className = 'timeline';
+    root.appendChild(timeline);
+
+    const card = document.createElement('div');
+    card.className = 'qa-card';
+
+    const phaseEl = document.createElement('div');
+    phaseEl.id = 'phaseTitle';
+    phaseEl.className = 'phase-title';
+    card.appendChild(phaseEl);
+
+    const qEl = document.createElement('div');
+    qEl.id = 'questionText';
+    qEl.className = 'question-text';
+    card.appendChild(qEl);
+
+    const opts = document.createElement('div');
+    opts.id = 'options';
+    opts.className = 'options';
+    card.appendChild(opts);
+
+    const nav = document.createElement('div');
+    nav.className = 'nav';
+    const prevBtn = document.createElement('button');
+    prevBtn.id = 'prevBtn';
+    prevBtn.className = 'btn';
+    prevBtn.textContent = 'Anterior';
+    const nextBtn = document.createElement('button');
+    nextBtn.id = 'nextBtn';
+    nextBtn.className = 'btn primary';
+    nextBtn.textContent = 'Siguiente';
+    const submitBtn = document.createElement('button');
+    submitBtn.id = 'submitBtn';
+    submitBtn.className = 'btn success';
+    submitBtn.textContent = 'Finalizar';
+    submitBtn.style.display = 'none';
+
+    nav.appendChild(prevBtn);
+    nav.appendChild(nextBtn);
+    nav.appendChild(submitBtn);
+    card.appendChild(nav);
+
+    const result = document.createElement('div');
+    result.id = 'result';
+    result.className = 'result';
+    card.appendChild(result);
+
+    root.appendChild(card);
+    document.body.appendChild(root);
+
+    return { timeline, phaseEl, qEl, opts, prevBtn, nextBtn, submitBtn, result };
+  }
+
+  function buildTimeline(container, total) {
+    container.innerHTML = '';
+    const bar = document.createElement('div');
+    bar.className = 'timeline-bar';
+    const fill = document.createElement('div');
+    fill.className = 'timeline-fill';
+    fill.style.width = '0%';
+    bar.appendChild(fill);
+    container.appendChild(bar);
+
+    const steps = document.createElement('div');
+    steps.className = 'timeline-steps';
+    for (let i = 0; i < total; i++) {
+      const s = document.createElement('div');
+      s.className = 'timeline-step';
+      s.dataset.index = i;
+      s.textContent = (i + 1);
+      steps.appendChild(s);
+    }
+    container.appendChild(steps);
+    return { fill, steps };
+  }
+
+  function updateTimeline(tl, answeredCount, total) {
+    const percent = Math.round((answeredCount / total) * 100);
+    tl.fill.style.width = percent + '%';
+    Array.from(tl.steps.children).forEach((s, idx) => {
+      s.classList.toggle('done', idx < answeredCount);
+      s.classList.toggle('current', idx === answeredCount);
+    });
+  }
+
+  function renderQuestion(q, ui, selectedId) {
+    ui.phaseEl.textContent = q.phaseTitle ? `${q.phaseTitle} (Fase ${q.phase ?? ''})` : '';
+    ui.qEl.textContent = q.text;
+    ui.opts.innerHTML = '';
+    if (!q.options || q.options.length === 0) {
+      const p = document.createElement('div');
+      p.textContent = 'Sin opciones.';
+      ui.opts.appendChild(p);
+      return;
+    }
+    q.options.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.className = 'opt-btn';
+      btn.textContent = opt.text || opt.label || opt.id;
+      if (selectedId === opt.id) btn.classList.add('selected');
+      btn.onclick = () => {
+        // marcar visual y guardar
+        Array.from(ui.opts.querySelectorAll('.opt-btn')).forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selections[q.id] = { questionId: q.id, answerId: opt.id, phase: q.phase };
+        // actualizar timeline
+        updateTimeline(timelineState, Object.keys(selections).length, questions.length);
+      };
+      ui.opts.appendChild(btn);
+    });
+  }
+
+  function renderRecommendations(data) {
+    ui.result.innerHTML = '';
+    const title = document.createElement('h2');
+    title.textContent = 'Recomendaciones';
+    ui.result.appendChild(title);
+
+    const grid = document.createElement('div');
+    grid.className = 'rec-grid';
+
+    const order = ['frontend','backend','database','architecture','methodology','security'];
+    const labels = {
+      frontend: 'Frontend',
+      backend: 'Backend',
+      database: 'Base de datos',
+      architecture: 'Arquitectura',
+      methodology: 'Metodología',
+      security: 'Seguridad'
+    };
+
+    order.forEach(cat => {
+      const items = data[cat] || [];
+      const card = document.createElement('div');
+      card.className = 'rec-card';
+      const h = document.createElement('h3');
+      h.textContent = labels[cat];
+      card.appendChild(h);
+      if (items.length === 0) {
+        const p = document.createElement('p');
+        p.className = 'muted';
+        p.textContent = 'No hay recomendaciones específicas.';
+        card.appendChild(p);
+      } else {
+        const ul = document.createElement('ul');
+        items.forEach(it => {
+          const li = document.createElement('li');
+          li.textContent = it;
+          ul.appendChild(li);
+        });
+        card.appendChild(ul);
+      }
+      grid.appendChild(card);
+    });
+
+    // Summary box con acciones a seguir
+    const summary = document.createElement('div');
+    summary.className = 'rec-summary';
+    summary.innerHTML = `<h3>Pasos recomendados</h3>
+      <ol>
+        <li>Prioriza la fase mínima viable (MVP) y elige stack recomendado para frontend y backend.</li>
+        <li>Configura una base de datos gestionada (Postgres) y backups.</li>
+        <li>Implementa CI/CD y monitorización básica.</li>
+        <li>Planifica seguridad básica: HTTPS, autenticación y backups.</li>
+      </ol>`;
+    ui.result.appendChild(grid);
+    ui.result.appendChild(summary);
+  }
+
+  // main
+  let questions = [];
+  let index = 0;
+  const selections = {};
+  const ui = createUI();
+  let timelineState = null;
+
+  ui.prevBtn.onclick = () => {
+    if (index > 0) {
+      index--;
+      ui.nextBtn.style.display = '';
+      ui.submitBtn.style.display = 'none';
+      ui.prevBtn.disabled = index === 0;
+      renderQuestion(questions[index], ui, selections[questions[index].id]?.answerId);
+    }
+  };
+  ui.nextBtn.onclick = () => {
+    const curQ = questions[index];
+    if (!selections[curQ.id]) {
+      alert('Selecciona una opción para continuar.');
+      return;
+    }
+    if (index < questions.length - 1) {
+      index++;
+      ui.prevBtn.disabled = false;
+      if (index === questions.length - 1) {
+        ui.nextBtn.style.display = 'none';
+        ui.submitBtn.style.display = '';
+      }
+      renderQuestion(questions[index], ui, selections[questions[index].id]?.answerId);
+    }
+  };
+  ui.submitBtn.onclick = async () => {
+    const arr = Object.values(selections);
+    if (arr.length < questions.length) {
+      if (!confirm('No respondiste todas las preguntas. ¿Enviar de todas formas?')) return;
+    }
+    ui.submitBtn.disabled = true;
+    ui.submitBtn.textContent = 'Enviando...';
+    try {
+      const res = await fetch('/evaluate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(arr)
+      });
+      if (!res.ok) throw new Error('Error al evaluar respuestas');
+      const data = await res.json();
+      renderRecommendations(data);
+      // marcar progress full
+      updateTimeline(timelineState, questions.length, questions.length);
+    } catch (e) {
+      ui.result.textContent = 'Error: ' + e.message;
+    } finally {
+      ui.submitBtn.disabled = false;
+      ui.submitBtn.textContent = 'Finalizar';
+    }
+  };
+
+  try {
+    const phases = await fetchQuestions();
+    questions = flattenQuestions(phases);
+    if (questions.length === 0) {
+      document.body.innerHTML = '<div class="empty">No se encontraron preguntas en el flujo.</div>';
+      return;
+    }
+    timelineState = buildTimeline(ui.timeline, questions.length);
+    renderQuestion(questions[index], ui, selections[questions[index].id]?.answerId);
+    updateTimeline(timelineState, 0, questions.length);
+    ui.prevBtn.disabled = true;
+    if (questions.length === 1) {
+      ui.nextBtn.style.display = 'none';
+      ui.submitBtn.style.display = '';
+    }
+  } catch (err) {
+    document.body.innerHTML = '<div class="error">Error cargando preguntas: ' + err.message + '</div>';
+  }
+})();
