@@ -52,18 +52,60 @@ app.mount("/static", StaticFiles(directory=static_dir), name="static")
 ROOT = None
 
 @app.on_event("startup")
+@app.on_event("startup")
+@app.on_event("startup")
+@app.on_event("startup")
 def load_tree():
     global ROOT
-    flujo_path = os.path.join(os.path.dirname(__file__), '..', 'flujo.txt')
-    # Try to read either workspace flujo.txt or app directory
-    if not os.path.exists(flujo_path):
-        flujo_path = os.path.join(os.path.dirname(__file__), '..', '..', 'flujo.txt')
-    if not os.path.exists(flujo_path):
-        raise RuntimeError("flujo.txt not found")
+
+    posibles_rutas = [
+        os.path.join(os.path.dirname(__file__), 'flujo.txt'),
+        os.path.join(os.path.dirname(__file__), '..', 'flujo.txt'),
+        os.path.join(os.path.dirname(__file__), '..', '..', 'flujo.txt'),
+        os.path.join(Path.cwd(), 'flujo.txt'),
+    ]
+
+    flujo_path = None
+    for ruta in posibles_rutas:
+        if os.path.exists(ruta):
+            flujo_path = ruta
+            break
+
+    if flujo_path is None:
+        raise RuntimeError("No se encontró flujo.txt en ninguna de las rutas esperadas")
+
+    print(f"✅ Archivo flujo.txt encontrado en: {flujo_path}")
+
     with open(flujo_path, 'r', encoding='utf-8') as f:
         text = f.read()
+
+    # 🔹 Aquí se construye el árbol base
+   # 🔹 Aquí se construye el árbol base
     ROOT = parse_flujo(text)
-    # initialize database
+
+    # 🔹 Añadir recomendaciones globales al árbol
+    frontend_rec = Node("rec_frontend", "React + Vite (Frontend rápido y moderno)", "recommendation")
+    backend_rec = Node("rec_backend", "Node.js con Express (Backend ágil y escalable)", "recommendation")
+    db_rec = Node("rec_db", "PostgreSQL (Base de datos relacional confiable)", "recommendation")
+    arch_rec = Node("rec_arch", "Microservicios con escalado horizontal", "recommendation")
+    meth_rec = Node("rec_meth", "Scrum o Kanban (metodologías ágiles)", "recommendation")
+    sec_rec = Node("rec_sec", "Implementa JWT, HTTPS y backups regulares", "recommendation")
+
+    # 🔹 Crear un nodo final de recomendaciones generales
+    final_recs = Node("phase_final", "📌 Recomendaciones generales", "phase")
+    final_recs.add_child(frontend_rec)
+    final_recs.add_child(backend_rec)
+    final_recs.add_child(db_rec)
+    final_recs.add_child(arch_rec)
+    final_recs.add_child(meth_rec)
+    final_recs.add_child(sec_rec)
+
+    ROOT.add_child(final_recs)
+
+    # 🔹 Conectar al árbol raíz
+    ROOT.add_child(final_recs)
+
+    # Inicializar base de datos
     init_db()
 
 
@@ -182,27 +224,23 @@ async def evaluate_answers(answers: List[Answer]):
             if found:
                 return found
         return None
-
-    # Simple categorization rules based on keywords
     def categorize(text: str) -> str:
         t = text.lower()
-        if any(k in t for k in ['react', 'vue', 'html', 'css', 'spa', 'webgl', 'canvas', 'frontend', 'reactjs']):
-            return 'frontend'
-        if any(k in t for k in ['node', 'django', 'flask', 'spring', 'java', 'go', 'rust', 'microserv', 'kubernetes', 'backend']):
-            return 'backend'
-        if any(k in t for k in ['sql', 'mysql', 'postgres', 'mongodb', 'firebase', 'hadoop', 'spark', 'database', 'db']):
-            return 'database'
-        if any(k in t for k in ['microserv', 'monolit', 'arquitectura', 'cloud', 'kubernetes', 'arquitectura', 'cloud-native']):
-            return 'architecture'
-        if any(k in t for k in ['scrum', 'kanban', 'waterfall', 'mvp', 'metodolog']):
-            return 'methodology'
-        if any(k in t for k in ['oauth', 'jwt', 'ssl', 'cifrado', 'security', 'compliance', 'iso']):
-            return 'security'
-        # ecommerce / payments -> backend category but will be enriched later
-        if any(k in t for k in ['commerce', 'e-commerce', 'comercio', 'shop', 'stripe', 'paypal', 'ventas']):
-            return 'backend'
-        # fallback
-        return 'backend'
+        keywords = {
+            'frontend': ['react', 'vue', 'angular', 'svelte', 'html', 'css', 'spa', 'webgl', 'canvas', 'frontend', 'ui', 'ux', 'tailwind', 'bootstrap'],
+            'backend': ['node', 'django', 'flask', 'spring', 'java', 'go', 'rust', 'php', 'express', 'laravel', 'backend', 'api', 'servidor'],
+            'database': ['sql', 'mysql', 'postgres', 'postgresql', 'mongodb', 'firebase', 'hadoop', 'spark', 'database', 'db', 'sqlite', 'oracle', 'nosql'],
+            'architecture': ['microserv', 'monolit', 'arquitectura', 'cloud', 'kubernetes', 'docker', 'serverless', 'cloud-native', 'infraestructura', 'scalable'],
+            'methodology': ['scrum', 'kanban', 'waterfall', 'mvp', 'metodolog', 'ágil', 'agile', 'iterativo', 'devops'],
+            'security': ['oauth', 'jwt', 'ssl', 'cifrado', 'security', 'compliance', 'iso', 'auth', 'seguridad', 'sso', 'protección'],
+        }
+
+        for category, keys in keywords.items():
+            if any(k in t for k in keys):
+                return category
+
+        # Si no se reconoce, devolver 'other' en lugar de 'backend'
+        return 'other'
 
     # Collect recommendation texts from selected options
     rec_texts = []
@@ -214,14 +252,17 @@ async def evaluate_answers(answers: List[Answer]):
                 if getattr(child, 'node_type', '') == 'recommendation':
                     rec_texts.append(child.text)
 
-    # If no recs were found under options, fallback to global recommendations
     if not rec_texts:
-        # use generic recommendations extracted from the tree
-        gen = ROOT.get_recommendations()
-        # flatten
-        for k, lst in gen.items():
-            for it in lst:
-                rec_texts.append(it)
+        # Si no hay recomendaciones derivadas, usar las globales que agregamos al árbol
+        global_recs = [
+            "React + Vite (Frontend rápido y moderno)",
+            "Node.js con Express (Backend ágil y escalable)",
+            "PostgreSQL (Base de datos relacional confiable)",
+            "Microservicios con escalado horizontal",
+            "Scrum o Kanban (metodologías ágiles)",
+            "Implementa JWT, HTTPS y backups regulares"
+        ]
+        rec_texts.extend(global_recs)
 
     # Deduplicate preserving order
     seen = set()
@@ -233,12 +274,22 @@ async def evaluate_answers(answers: List[Answer]):
 
     # categorize
     recommendations: Dict[str, List[str]] = {
-        'frontend': [], 'backend': [], 'database': [],
-        'architecture': [], 'methodology': [], 'security': []
+        'frontend': [],
+        'backend': [],
+        'database': [],
+        'architecture': [],
+        'methodology': [],
+        'security': [],
+        'other': []  # ← agregamos esta categoría extra
     }
+
     for r in rec_texts_unique:
         cat = categorize(r)
-        recommendations[cat].append(r)
+        if cat not in recommendations:
+            recommendations["other"].append(r)
+        else:
+            recommendations[cat].append(r)
+
 
     # RULE-BASED ENRICHMENT: apply more precise recommendations based on answers
     # Helper to get option text and question text
