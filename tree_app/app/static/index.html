@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Asistente de Selección Tecnológica</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Asistente de Selección Tecnológica</h1>
+            <p class="subtitle">Encuentra el stack tecnológico ideal para tu proyecto</p>
+        </header>
+        
+        <div id="progress-container">
+            <div class="phase-title">
+                <h3 id="current-phase-title">Identificación del Proyecto</h3>
+            </div>
+            <div id="progress-bar">
+                <div class="progress-step active" data-phase="1" title="Identificación del Proyecto">
+                    <span class="step-number">1</span>
+                    <span class="step-name">Identificación</span>
+                </div>
+                <div class="progress-step" data-phase="2" title="Requerimientos Técnicos">
+                    <span class="step-number">2</span>
+                    <span class="step-name">Requerimientos</span>
+                </div>
+                <div class="progress-step" data-phase="3" title="Gestión de Datos">
+                    <span class="step-number">3</span>
+                    <span class="step-name">Datos</span>
+                </div>
+                <div class="progress-step" data-phase="4" title="Contexto de Desarrollo">
+                    <span class="step-number">4</span>
+                    <span class="step-name">Contexto</span>
+                </div>
+                <div class="progress-step" data-phase="5" title="Consideraciones Específicas">
+                    <span class="step-number">5</span>
+                    <span class="step-name">Específicas</span>
+                </div>
+            </div>
+        </div>
+
+        <main>
+            <div id="question-container">
+                <h2 id="current-question">Bienvenido al Asistente</h2>
+                <p id="question-description" class="question-description"></p>
+                <div id="options-container" class="options-grid">
+                    <!-- Las opciones se cargarán dinámicamente -->
+                </div>
+            </div>
+
+            <div id="navigation">
+                <button id="prevBtn" disabled>Anterior</button>
+                <button id="nextBtn">Comenzar</button>
+            </div>
+
+            <div id="results" class="hidden">
+                <h2>Stack Tecnológico Recomendado</h2>
+                <div class="recommendations-grid">
+                    <div class="recommendation-card" id="frontend-recommendations">
+                        <h3>Frontend</h3>
+                        <div class="recommendation-content"></div>
+                    </div>
+                    <div class="recommendation-card" id="backend-recommendations">
+                        <h3>Backend</h3>
+                        <div class="recommendation-content"></div>
+                    </div>
+                    <div class="recommendation-card" id="database-recommendations">
+                        <h3>Base de Datos</h3>
+                        <div class="recommendation-content"></div>
+                    </div>
+                    <div class="recommendation-card" id="architecture-recommendations">
+                        <h3>Arquitectura</h3>
+                        <div class="recommendation-content"></div>
+                    </div>
+                    <div class="recommendation-card" id="methodology-recommendations">
+                        <h3>Metodología</h3>
+                        <div class="recommendation-content"></div>
+                    </div>
+                    <div class="recommendation-card" id="security-recommendations">
+                        <h3>Seguridad</h3>
+                        <div class="recommendation-content"></div>
+                    </div>
+                </div>
+                <div class="actions">
+                    <button id="exportPDF">Exportar PDF</button>
+                    <button id="exportJSON">Exportar JSON</button>
+                    <button id="startNew">Nuevo Proyecto</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,215 @@
+@startuml
+title 🌐 Árbol de Decisión - Asistente de Selección Tecnológica
+
+start
+:Inicio del Cuestionario;
+
+'─────────────────────────────
+' FASE 1: IDENTIFICACIÓN DEL PROYECTO
+'─────────────────────────────
+partition "FASE 1: Identificación del Proyecto" {
+  :Pregunta 1: ¿Qué tipo de aplicación planeas desarrollar?;
+  if (Tipo de aplicación) then (Web)
+    :Aplicación Web;
+  elseif (Móvil)
+    :Aplicación Móvil;
+  elseif (Escritorio)
+    :Aplicación de Escritorio;
+  elseif (Híbrida)
+    :Aplicación Híbrida;
+  else (Empresarial)
+    :Aplicación Empresarial;
+  endif
+
+  :Pregunta 2: ¿Cuál es el ámbito principal del proyecto?;
+  if (Público general)
+    :Consumidor / Público general;
+  elseif (Empresas)
+    :Empresas / Negocios;
+  elseif (Uso interno)
+    :Uso interno / Herramienta interna;
+  elseif (Educación)
+    :Educación / Formación;
+  else (Comercio electrónico)
+    :Comercio electrónico / Ventas en línea;
+  endif
+}
+
+'─────────────────────────────
+' FASE 2: REQUERIMIENTOS TÉCNICOS
+'─────────────────────────────
+partition "FASE 2: Requerimientos Técnicos" {
+  :Pregunta 3: ¿Qué característica es más prioritaria?;
+  if (Velocidad de desarrollo)
+    :Usar framework rápido (Node.js, React, Laravel);
+  elseif (Alto rendimiento)
+    :Lenguajes compilados (Go, Rust, C++);
+  elseif (Escalabilidad)
+    :Microservicios, Kubernetes, Docker;
+  elseif (Facilidad de aprendizaje)
+    :Lenguajes populares (Python, JavaScript, PHP);
+  elseif (Mantenibilidad)
+    :Arquitectura limpia (Java, .NET, Laravel);
+  else (Seguridad)
+    :Frameworks seguros (Spring, Django, ASP.NET);
+  endif
+
+  :Pregunta 4: ¿Cuál es la complejidad funcional?;
+  if (Baja)
+    :Arquitectura simple;
+  elseif (Media)
+    :Módulos integrados;
+  elseif (Alta)
+    :Servicios independientes;
+  else (Corporativa)
+    :Arquitectura distribuida en capas;
+  endif
+
+  :Pregunta 5: ¿Qué tipo de interfaz necesitas?;
+  if (Simple)
+    :HTML/CSS/Bootstrap;
+  elseif (Interactiva)
+    :SPA (React, Vue, Angular);
+  elseif (Rica en gráficos)
+    :WebGL, Canvas o frameworks 3D;
+  else (Tiempo real)
+    :Sockets / WebRTC;
+  endif
+}
+
+'─────────────────────────────
+' FASE 3: GESTIÓN DE DATOS
+'─────────────────────────────
+partition "FASE 3: Gestión de Datos" {
+  :Pregunta 6: ¿Qué tipo de estructura de datos manejarás?;
+  if (Estructurada)
+    :Base de datos SQL (MySQL, PostgreSQL);
+  elseif (Semi-estructurada)
+    :NoSQL (MongoDB, Firebase);
+  elseif (No estructurada)
+    :Data lakes o almacenamiento en la nube;
+  else (Mixta)
+    :Combinación (Polyglot Persistence);
+  endif
+
+  :Pregunta 7: ¿Cuál será el volumen de datos?;
+  if (Pequeño)
+    :DB local o gratuita;
+  elseif (Medio)
+    :Hosting gestionado;
+  elseif (Grande)
+    :Escalado horizontal;
+  else (Masivo)
+    :Big Data (Hadoop, Spark);
+  endif
+
+  :Pregunta 8: ¿Qué tipo de operaciones predominan?;
+  if (Lectura intensiva)
+    :Cache / CDN (Redis, Cloudflare);
+  elseif (Escritura intensiva)
+    :Colas de mensajería (Kafka, RabbitMQ);
+  elseif (Balanceado)
+    :RDBMS tradicional;
+  else (Transacciones complejas)
+    :Bases de datos ACID (PostgreSQL, Oracle);
+  endif
+}
+
+'─────────────────────────────
+' FASE 4: CONTEXTO DE DESARROLLO
+'─────────────────────────────
+partition "FASE 4: Contexto de Desarrollo" {
+  :Pregunta 9: ¿Cuál es el tamaño del equipo?;
+  if (Individual)
+    :Stack Full-Stack simple (Laravel + Vue);
+  elseif (Pequeño)
+    :Monolito modular;
+  elseif (Mediano)
+    :Servicios divididos por módulos;
+  elseif (Grande)
+    :Microservicios + control de versiones avanzado;
+  else (Distribuido)
+    :Arquitectura cloud-native;
+  endif
+
+  :Pregunta 10: ¿Qué metodología de trabajo usan?;
+  if (Ágil)
+    :Scrum / Kanban;
+  elseif (Tradicional)
+    :Waterfall;
+  elseif (Híbrida)
+    :Iterativo + planificación;
+  elseif (Prototipado rápido)
+    :MVP + retroalimentación continua;
+  else (Libre)
+    :Sin metodología definida;
+  endif
+
+  :Pregunta 11: ¿Hay restricciones de tiempo?;
+  if (Crítico)
+    :Framework rápido (React, Laravel, Flutter);
+  elseif (Flexible)
+    :Optimizar calidad y pruebas;
+  elseif (Iterativo)
+    :Despliegues cortos y frecuentes;
+  else (No definido)
+    :Sin presión temporal;
+  endif
+
+  :Pregunta 12: ¿Cuál es el presupuesto?;
+  if (Bajo)
+    :Herramientas Open Source y servicios gratuitos;
+  elseif (Moderado)
+    :Servicios gestionados básicos;
+  elseif (Corporativo)
+    :Soluciones empresariales pagas;
+  else (Ilimitado)
+    :Arquitectura personalizada escalable;
+  endif
+}
+
+'─────────────────────────────
+' FASE 5: CONSIDERACIONES ESPECÍFICAS
+'─────────────────────────────
+partition "FASE 5: Consideraciones Específicas" {
+  :Pregunta 13: ¿Necesitas integraciones externas?;
+  if (Múltiples APIs)
+    :Usar API Gateway;
+  elseif (Redes Sociales)
+    :OAuth / SDKs oficiales;
+  elseif (Pagos)
+    :Integrar Stripe o PayPal;
+  elseif (Servicios en la nube)
+    :Usar SDKs de AWS / GCP / Azure;
+  else (Mínimas)
+    :Aplicación independiente;
+  endif
+
+  :Pregunta 14: ¿Qué nivel de seguridad se requiere?;
+  if (Estándar)
+    :HTTPS, autenticación básica;
+  elseif (Avanzada)
+    :OAuth2, JWT, cifrado AES;
+  elseif (Corporativa)
+    :SSO, cumplimiento ISO/PCI;
+  else (Crítica)
+    :Cifrado extremo a extremo + auditorías;
+  endif
+
+  :Pregunta 15: ¿El proyecto será multiidioma?;
+  if (Local)
+    :Un solo idioma;
+  elseif (Multiidioma)
+    :i18n frameworks (Vue-i18n, react-intl);
+  elseif (Global)
+    :Infraestructura multi-región;
+  else (No definido)
+    :No aplica;
+  endif
+}
+
+:Generar reporte final con el stack recomendado;
+:Mostrar tecnologías sugeridas para frontend, backend, base de datos y arquitectura;
+
+stop
+@enduml

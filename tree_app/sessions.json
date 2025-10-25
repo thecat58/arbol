@@ -1,0 +1,311 @@
+[
+  {
+    "id": "1761351038840",
+    "answers": [],
+    "timestamp": "2025-10-25T00:10:38.840000+00:00"
+  },
+  {
+    "id": "1761351050419",
+    "answers": [],
+    "timestamp": "2025-10-25T00:10:50.419000+00:00"
+  },
+  {
+    "id": "1761351123348",
+    "answers": [],
+    "timestamp": "2025-10-25T00:12:03.348000+00:00"
+  },
+  {
+    "id": "1761352102387",
+    "answers": [
+      {
+        "questionId": "q1_1",
+        "answerId": "o1_1",
+        "phase": 1
+      },
+      {
+        "questionId": "q1_2",
+        "answerId": "o1_8",
+        "phase": 1
+      },
+      {
+        "questionId": "q2_3",
+        "answerId": "o2_10",
+        "phase": 1
+      },
+      {
+        "questionId": "q2_4",
+        "answerId": "o2_16",
+        "phase": 1
+      },
+      {
+        "questionId": "q2_5",
+        "answerId": "o2_18",
+        "phase": 1
+      },
+      {
+        "questionId": "q3_6",
+        "answerId": "o3_19",
+        "phase": 1
+      },
+      {
+        "questionId": "q3_7",
+        "answerId": "o3_22",
+        "phase": 1
+      },
+      {
+        "questionId": "q3_8",
+        "answerId": "o3_23",
+        "phase": 1
+      },
+      {
+        "questionId": "q4_9",
+        "answerId": "o4_27",
+        "phase": 1
+      },
+      {
+        "questionId": "q4_10",
+        "answerId": "o4_29",
+        "phase": 1
+      },
+      {
+        "questionId": "q4_11",
+        "answerId": "o4_32",
+        "phase": 1
+      },
+      {
+        "questionId": "q4_12",
+        "answerId": "o4_33",
+        "phase": 1
+      },
+      {
+        "questionId": "q5_13",
+        "answerId": "o5_37",
+        "phase": 5
+      },
+      {
+        "questionId": "q5_14",
+        "answerId": "o5_38",
+        "phase": 5
+      },
+      {
+        "questionId": "q5_15",
+        "answerId": "o5_41",
+        "phase": 5
+      }
+    ],
+    "timestamp": "2025-10-25T00:28:22.387000+00:00"
+  },
+  {
+    "id": "1761353033047",
+    "answers": [
+      {
+        "questionId": "q1_1",
+        "answerId": "o1_2",
+        "phase": 1
+      },
+      {
+        "questionId": "q1_2",
+        "answerId": "o1_6",
+        "phase": 1
+      },
+      {
+        "questionId": "q2_3",
+        "answerId": "o2_10",
+        "phase": 1
+      },
+      {
+        "questionId": "q2_4",
+        "answerId": "o2_15",
+        "phase": 1
+      },
+      {
+        "questionId": "q2_5",
+        "answerId": "o2_18",
+        "phase": 1
+      },
+      {
+        "questionId": "q3_6",
+        "answerId": "o3_20",
+        "phase": 1
+      },
+      {
+        "questionId": "q3_7",
+        "answerId": "o3_22",
+        "phase": 1
+      },
+      {
+        "questionId": "q3_8",
+        "answerId": "o3_24",
+        "phase": 1
+      },
+      {
+        "questionId": "q4_9",
+        "answerId": "o4_26",
+        "phase": 1
+      },
+      {
+        "questionId": "q4_10",
+        "answerId": "o4_29",
+        "phase": 1
+      },
+      {
+        "questionId": "q4_11",
+        "answerId": "o4_32",
+        "phase": 1
+      },
+      {
+        "questionId": "q4_12",
+        "answerId": "o4_34",
+        "phase": 1
+      },
+      {
+        "questionId": "q5_13",
+        "answerId": "o5_36",
+        "phase": 5
+      },
+      {
+        "questionId": "q5_14",
+        "answerId": "o5_39",
+        "phase": 5
+      },
+      {
+        "questionId": "q5_15",
+        "answerId": "o5_41",
+        "phase": 5
+      }
+    ],
+    "timestamp": "2025-10-25T00:43:53.047000+00:00"
+  },
+  {
+    "id": "1761354141705",
+    "answers": [
+      {
+        "questionId": "q1_1",
+        "answerId": "o1_2",
+        "phase": 1
+      },
+      {
+        "questionId": "q1_2",
+        "answerId": "o1_6",
+        "phase": 1
+      },
+      {
+        "questionId": "q2_3",
+        "answerId": "o2_10",
+        "phase": 1
+      },
+      {
+        "questionId": "q2_4",
+        "answerId": "o2_15",
+        "phase": 1
+      },
+      {
+        "questionId": "q2_5",
+        "answerId": "o2_18",
+        "phase": 1
+      },
+      {
+        "questionId": "q3_7",
+        "answerId": "o3_22",
+        "phase": 1
+      },
+      {
+        "questionId": "q3_8",
+        "answerId": "o3_24",
+        "phase": 1
+      },
+      {
+        "questionId": "q4_11",
+        "answerId": "o4_32",
+        "phase": 1
+      },
+      {
+        "questionId": "q4_12",
+        "answerId": "o4_34",
+        "phase": 1
+      },
+      {
+        "questionId": "q5_13",
+        "answerId": "o5_36",
+        "phase": 5
+      },
+      {
+        "questionId": "q5_14",
+        "answerId": "o5_39",
+        "phase": 5
+      },
+      {
+        "questionId": "q5_15",
+        "answerId": "o5_41",
+        "phase": 5
+      }
+    ],
+    "timestamp": "2025-10-25T01:02:21.705000+00:00"
+  },
+  {
+    "id": "1761355379492",
+    "answers": [
+      {
+        "questionId": "q1_1",
+        "answerId": "o1_2",
+        "phase": 1
+      },
+      {
+        "questionId": "q1_2",
+        "answerId": "o1_6",
+        "phase": 1
+      },
+      {
+        "questionId": "q2_3",
+        "answerId": "o2_10",
+        "phase": 1
+      },
+      {
+        "questionId": "q2_4",
+        "answerId": "o2_15",
+        "phase": 1
+      },
+      {
+        "questionId": "q2_5",
+        "answerId": "o2_18",
+        "phase": 1
+      },
+      {
+        "questionId": "q3_7",
+        "answerId": "o3_22",
+        "phase": 1
+      },
+      {
+        "questionId": "q3_8",
+        "answerId": "o3_24",
+        "phase": 1
+      },
+      {
+        "questionId": "q4_11",
+        "answerId": "o4_32",
+        "phase": 1
+      },
+      {
+        "questionId": "q4_12",
+        "answerId": "o4_34",
+        "phase": 1
+      },
+      {
+        "questionId": "q5_13",
+        "answerId": "o5_36",
+        "phase": 5
+      },
+      {
+        "questionId": "q5_14",
+        "answerId": "o5_39",
+        "phase": 5
+      },
+      {
+        "questionId": "q5_15",
+        "answerId": "o5_41",
+        "phase": 5
+      }
+    ],
+    "timestamp": "2025-10-25T01:22:59.493000+00:00"
+  }
+]
